@@ -1,20 +1,47 @@
 # img_viewer.py
 
 import PySimpleGUI as sg
+import pandas as pd
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os.path
 import csv
 import re
-import matplotlib.pyplot
+import matplotlib.pyplot as mpl
+import matplotlib
 
 # Log File Parser, rebuilt for the APStatMachine
 sentEvents = []
 
+gameCodeDict = {
+    "CL": "Clique",
+    "DS": "Dark Souls III",
+    "DM": "Doom 1993",
+    "FT": "Factorio",
+    "HK": "Hollow Knight",
+    "KH": "Kingdom Hearts 2",
+    "LZ": "Legend of Zelda",
+    "MM": "Megaman Battle Network 3",
+    "MC": "Minecraft",
+    "NA": "Noita",
+    "OT": "Ocarina of Time",
+    "PE": "Pokemon Emerald",
+    "PB": "Pokemon Blue",
+    "PR": "Pokemon Red",
+    "RT": "Raft",
+    "RR": "Risk of Rain 2",
+    "SS": "Slay the Spire",
+    "SC": "StarCraft 2",
+    "SV": "Stardew Valley",
+    "SB": "Subnautica",
+    "TR": "Terraria",
+    "WG": "Wargroove"
+}
 
-def parseLogFile(logFilePath):
+
+def parseSentEvents(logFilePath):
+    global sentEventsDF
     # Open the text file for reading and CSV file for writing (create if not exists)
-    currentRow = 0
     with open(logFilePath, 'r') as infile:
         # Event Patterns
         sentPattern = re.compile(
@@ -62,50 +89,50 @@ def parseLogFile(logFilePath):
                     print("Weird starting character found")
                 newRow.append(item)
                 sentEvents.append(newRow)
+    sentEventsDF = pd.DataFrame(
+        sentEvents, columns=[
+            "Date/Time (UTC)", "Sender", "Sender Game", "Receiver", "Receiver Game", "Item"])
+    print(sentEventsDF)
 
-
-fig = matplotlib.pyplot.Figure(figsize=(5, 4), dpi=100)
-t = np.arange(0, 3, .01)
-fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
 
 matplotlib.use("TkAgg")
 
 
-def draw_figure(canvas, figure):
-    figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
+def draw_figures(canvas):
+
+    # Plot the pie chart
+    global fig
+    global flat_axes
+    fig, axes = mpl.subplots(2, 2, figsize=(8, 8))
+    flat_axes = axes.flatten()
+    generate_plot_for_ax(0, "Sender")
+    generate_plot_for_ax(1, "Sender Game")
+    generate_plot_for_ax(2, "Receiver")
+    generate_plot_for_ax(3, "Receiver Game")
+
+    figure_canvas_agg = FigureCanvasTkAgg(fig, canvas)
     figure_canvas_agg.draw()
     figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
-    return figure_canvas_agg
 
 
-# Code to Game Dictionary, may not be required for future, but leaving it in for now as a just in case.
-gameCodeDict = {
-    "CL": "Clique",
-    "DS": "Dark Souls III",
-    "DM": "Doom 1993",
-    "FT": "Factorio",
-    "HK": "Hollow Knight",
-    "KH": "Kingdom Hearts 2",
-    "LZ": "Legend of Zelda",
-    "MM": "Megaman Battle Network 3",
-    "MC": "Minecraft",
-    "NA": "Noita",
-    "OT": "Ocarina of Time",
-    "PE": "Pokemon Emerald",
-    "PB": "Pokemon Blue",
-    "PR": "Pokemon Red",
-    "RT": "Raft",
-    "RR": "Risk of Rain 2",
-    "SS": "Slay the Spire",
-    "SC": "StarCraft 2",
-    "SV": "Stardew Valley",
-    "SB": "Subnautica",
-    "TR": "Terraria",
-    "WG": "Wargroove"
-}
+def generate_plot_for_ax(ax_index, column_name):
+    value_counts = sentEventsDF[column_name].value_counts()
+
+    flat_axes[ax_index].pie(value_counts, labels=value_counts.index,
+                            autopct='%1.1f%%', startangle=140)
+    flat_axes[ax_index].axis('equal')
+    flat_axes[ax_index].set_title(f'Pie Chart of {column_name}')
+
 
 # First the window layout in 2 columns. Intend to utilize this still as a framework:
 # First column for File Input and stat readout, second column for chart generation.
+settings_frame = [
+    [sg.Text("Items sent to self:"),
+     sg.Radio("Include", "Exlusion-Options"), sg.Radio("Exclude", "Exlusion-Options", True)],
+    [sg.Text("By player or by game?"), sg.OptionMenu(
+        ["By Player", "By Game"])],
+    [sg.Button("Generate", enable_events=True, key="-GENERATE GRAPH-")]
+]
 
 paths_and_settings_column = [
     [
@@ -121,8 +148,12 @@ paths_and_settings_column = [
     [
         sg.Table(key="-TABLEPREVIEW-", headings=[
                  "Date/Time (UTC)", "Sender", "Sender Game", "Receiver", "Receiver Game", "Item"], values=sentEvents)
+    ],
+    [
+        sg.Frame("Settings", settings_frame)
     ]
 ]
+
 
 # For now will only show the name of the file that was chosen
 image_viewer_column = [
@@ -155,7 +186,6 @@ layout = [
 
 window = sg.Window("AP Statistic Machine", layout, finalize=True)
 
-draw_figure(window["-CANVAS-"].TKCanvas, fig)
 
 # Run the Event Loop
 while True:
@@ -164,8 +194,9 @@ while True:
         break
 
     if event == "-LOG PATH-":
-        parseLogFile(window["-LOG PATH-"].get())
+        parseSentEvents(window["-LOG PATH-"].get())
         window["-TABLEPREVIEW-"].update(values=sentEvents)
-
-
+    elif event == "-GENERATE GRAPH-":
+        print(sentEventsDF.columns)
+        draw_figures(window["-CANVAS-"].TKCanvas)
 window.close()
