@@ -1,41 +1,20 @@
-import csv
 import re
-import sys
+import os.path
+import statMachComponents as appComps
 
-print(sys.path)
-gameCodeDict = {
-    "CL": "Clique",
-    "DS": "Dark Souls III",
-    "DM": "Doom 1993",
-    "FT": "Factorio",
-    "HK": "Hollow Knight",
-    "KH": "Kingdom Hearts 2",
-    "LZ": "Legend of Zelda",
-    "MM": "Megaman Battle Network 3",
-    "MC": "Minecraft",
-    "NA": "Noita",
-    "OT": "Ocarina of Time",
-    "PE": "Pokemon Emerald",
-    "PB": "Pokemon Blue",
-    "PR": "Pokemon Red",
-    "RT": "Raft",
-    "RR": "Risk of Rain 2",
-    "SS": "Slay the Spire",
-    "SC": "StarCraft 2",
-    "SV": "Stardew Valley",
-    "SB": "Subnautica",
-    "TR": "Terraria",
-    "WG": "Wargroove"
-}
-
-
-def parseSentEvents(logFilePath):
+def parseEvents(logFilePath, type="Sent"):
     # Open the text file for reading and CSV file for writing (create if not exists)
-    sentEvents = []
     with open(logFilePath, 'r') as infile:
         # Event Patterns
         sentPattern = re.compile(
             r"\[root at (\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}),\d{3}\]: \(Team #\d\) (\w+) sent (.+?) to (\w+)")
+
+        # Hint Pattern (not currently in use)
+        hintPattern = re.compile(
+            r"\[root at (\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}),\d{3}\]: Notice \(Team #1\): \[Hint\]: (\w+)'s (.+?) is at (.+?) in (\w+)'s World\.")
+
+        # To become a 2D Array, convertable into a dataframe.
+        sentEvents = []
 
         for line in infile:
             # Iterate over the sent events
@@ -53,7 +32,7 @@ def parseSentEvents(logFilePath):
                 senderComp = match.group(3)
                 sender = senderComp[:-2]
                 try:
-                    senderGame = gameCodeDict[senderComp[-2:]]
+                    senderGame = appComps.gameCodes[senderComp[-2:]]
                 except:
                     senderGame = senderComp[-2:]
 
@@ -64,7 +43,7 @@ def parseSentEvents(logFilePath):
                 receiverComp = match.group(5)
                 receiver = receiverComp[:-2]
                 try:
-                    receiverGame = gameCodeDict[receiverComp[-2:]]
+                    receiverGame = appComps.gameCodes[receiverComp[-2:]]
                 except:
                     receiverGame = receiverComp[-2:]
 
@@ -79,4 +58,7 @@ def parseSentEvents(logFilePath):
                     print("Weird starting character found")
                 newRow.append(item)
                 sentEvents.append(newRow)
+    sentEventsDF = pd.DataFrame(
+        sentEvents, columns=[
+            "Date/Time (UTC)", "Sender", "Sender Game", "Receiver", "Receiver Game", "Item"])
     return sentEvents
