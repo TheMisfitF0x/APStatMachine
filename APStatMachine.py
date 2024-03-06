@@ -7,12 +7,14 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os.path
 import csv
 import re
+import tkinter as tk
 import matplotlib.pyplot as mpl
 import matplotlib
 
 # Log File Parser, rebuilt for the APStatMachine
 sentEvents = []
-
+graphsGenerated = False
+figure_canvas_agg = None
 gameCodeDict = {
     "CL": "Clique",
     "DS": "Dark Souls III",
@@ -34,6 +36,7 @@ gameCodeDict = {
     "SC": "StarCraft 2",
     "SV": "Stardew Valley",
     "SB": "Subnautica",
+    "SM": "Super Mario World",
     "TR": "Terraria",
     "WG": "Wargroove"
 }
@@ -99,17 +102,28 @@ matplotlib.use("TkAgg")
 
 
 def draw_figures(canvas):
-
-    # Plot the pie chart
-    global fig
-    global flat_axes
-    fig, axes = mpl.subplots(2, 2, figsize=(8, 8))
-    flat_axes = axes.flatten()
-    generate_plot_for_ax(0, "Sender")
-    generate_plot_for_ax(1, "Sender Game")
-    generate_plot_for_ax(2, "Receiver")
-    generate_plot_for_ax(3, "Receiver Game")
-
+    global graphsGenerated
+    global figure_canvas_agg
+    print(graphsGenerated)
+    if (graphsGenerated == False):
+        # Plot the pie chart
+        global fig
+        global axes
+        fig, axGrid = mpl.subplots(2, 2, figsize=(8, 8))
+        axes = axGrid.flatten()
+        generate_plot_for_ax(0, "Sender")
+        generate_plot_for_ax(1, "Sender Game")
+        generate_plot_for_ax(2, "Receiver")
+        generate_plot_for_ax(3, "Receiver Game")
+        graphsGenerated = True
+        print(graphsGenerated)
+        
+    else:
+        generate_plot_for_ax(0, "Sender")
+        generate_plot_for_ax(1, "Sender Game")
+        generate_plot_for_ax(2, "Receiver")
+        generate_plot_for_ax(3, "Receiver Game")
+        
     figure_canvas_agg = FigureCanvasTkAgg(fig, canvas)
     figure_canvas_agg.draw()
     figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
@@ -117,11 +131,14 @@ def draw_figures(canvas):
 
 def generate_plot_for_ax(ax_index, column_name):
     value_counts = sentEventsDF[column_name].value_counts()
+    axes[ax_index].pie(value_counts, labels=value_counts.index,
+                       autopct='%1.1f%%', startangle=140)
+    axes[ax_index].axis('equal')
+    axes[ax_index].set_title(f'Pie Chart of {column_name}')
 
-    flat_axes[ax_index].pie(value_counts, labels=value_counts.index,
-                            autopct='%1.1f%%', startangle=140)
-    flat_axes[ax_index].axis('equal')
-    flat_axes[ax_index].set_title(f'Pie Chart of {column_name}')
+
+def draw_plot_to_alt_window():
+    mpl.show()
 
 
 # First the window layout in 2 columns. Intend to utilize this still as a framework:
@@ -131,7 +148,8 @@ settings_frame = [
      sg.Radio("Include", "Exlusion-Options"), sg.Radio("Exclude", "Exlusion-Options", True)],
     [sg.Text("By player or by game?"), sg.OptionMenu(
         ["By Player", "By Game"])],
-    [sg.Button("Generate", enable_events=True, key="-GENERATE GRAPH-")]
+    [sg.Button("Generate", enable_events=True, key="-GENERATE GRAPH-"),
+     sg.Button("Push Out", enable_events=True, key="-POP OUT GRAPH-")]
 ]
 
 paths_and_settings_column = [
@@ -197,6 +215,13 @@ while True:
         parseSentEvents(window["-LOG PATH-"].get())
         window["-TABLEPREVIEW-"].update(values=sentEvents)
     elif event == "-GENERATE GRAPH-":
-        print(sentEventsDF.columns)
-        draw_figures(window["-CANVAS-"].TKCanvas)
+        if graphsGenerated:
+            window["-CANVAS-"].TKCanvas.delete("all")
+            draw_figures(window["-CANVAS-"].TKCanvas)
+        else:
+            draw_figures(window["-CANVAS-"].TKCanvas)
+    elif event == "-UPDATE SETTINGS-":
+        print("Settings")
+    elif event == "-POP OUT GRAPH-":
+        draw_plot_to_alt_window()
 window.close()
