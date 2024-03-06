@@ -58,7 +58,4 @@ def parseEvents(logFilePath, type="Sent"):
                     print("Weird starting character found")
                 newRow.append(item)
                 sentEvents.append(newRow)
-    sentEventsDF = pd.DataFrame(
-        sentEvents, columns=[
-            "Date/Time (UTC)", "Sender", "Sender Game", "Receiver", "Receiver Game", "Item"])
     return sentEvents
