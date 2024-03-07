@@ -60,7 +60,7 @@ paths_and_settings_column = [
     ],
     [  # Thinking of moving this into a tab view sort of system...
         sg.Table(key="-TABLE PREVIEW-", headings=[
-                 "Date/Time (UTC)", "Sender", "Sender Game", "Receiver", "Receiver Game", "Item"])
+                 "Date/Time (UTC)", "Sender", "Sender Game", "Receiver", "Receiver Game", "Item"], values=[])
     ],
     [
         sg.Frame("Shotgun Pies View Settings", shotgun_graphs_settings),

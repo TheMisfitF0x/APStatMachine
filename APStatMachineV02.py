@@ -7,7 +7,7 @@ import tkinter as tk
 import matplotlib.pyplot as mpl
 import matplotlib
 import statMachComponents as appComps
-import logparser as lp
+from logparser import LogParser
 
 # Set MatPlotLib to use the proper backend for PySimpleGUI
 matplotlib.use("TkAgg")
@@ -28,8 +28,6 @@ def draw_figure(canvas, figure, loc=(0, 0)):
     return figure_canvas_agg
 
 
-
-
 # Init
 window = sg.Window("AP Statistic Machine", appComps.layout, finalize=True)
 
@@ -38,4 +36,8 @@ while True:
     event, values = window.read()
     if event == "Exit" or event == sg.WIN_CLOSED:
         break
+
+    if event == "-LOG PATH-":
+        lp = LogParser(window["-LOG PATH-"].get())
+        window["-TABLE PREVIEW-"].update(values=lp.GetSentEvents())
 window.close()
