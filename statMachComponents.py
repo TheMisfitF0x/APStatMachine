@@ -8,6 +8,7 @@ gameCodes = {
     "DM": "Doom 1993",
     "FT": "Factorio",
     "HK": "Hollow Knight",
+    "IN": "Inscryption",
     "KH": "Kingdom Hearts 2",
     "LZ": "Legend of Zelda",
     "MM": "Megaman Battle Network 3",
@@ -40,7 +41,7 @@ shotgun_graphs_settings = [
 
 focus_graph_settings = [
     [sg.Text("Items sent to self:"),
-     sg.Radio("Include", "F-Exlusion-Options"), sg.Radio("Exclude", "F-Exlusion-Options", True)],
+     sg.Radio("Include", "F-Exlusion-Options", key = "-F EX UPDATE-"), sg.Radio("Exclude", "F-Exlusion-Options", True, key = "-F EX UPDATE-")],
     [sg.Button("Generate", enable_events=True, key="-GENERATE FOCUS-"),
      sg.Button("Push Out", enable_events=True, key="-POP OUT FOCUS-")]
 ]

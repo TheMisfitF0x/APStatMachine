@@ -3,14 +3,11 @@ import os.path
 import statMachComponents as appComps
 from enum import Enum
 
-# Enum for clarity when defining the type of event to be found and filtered.
-# May be discontinued in favor of a more complicated parser class
-# Eventually I want to drop this in favor of evaluating the whole log in one go and just adding each event to it's own 2D array,
-# And use a parser object to hold and manage those different 2D arrays.
-# Maybe something like a DataParser class that requires a log file to be constructed,
-# A dictionary or enum for all the patterns and has an updateData() function of the sort?
-# IDK but sounds like a blast.
-
+#Nah, still doing Enumns cuz they look nice.
+class EventType(Enum):
+    Sent = 0
+    Hint = 1
+    Complete = 2
 
 class LogParser:
     logFilePath = ""
@@ -32,8 +29,14 @@ class LogParser:
         print("Hint Events: " + str(len(self.hintEvents)))
         print("Completed Events: " + str(len(self.completeEvents)))
 
-    def GetSentEvents(self):
-        return self.sentEvents
+    def GetEvents(self, eventType):
+        if eventType == EventType.Sent:
+            return self.sentEvents
+        elif eventType == EventType.Hint:
+            return self.hintEvents
+        elif eventType == EventType.Complete:
+            return self.completeEvents
+        
 
     def ParseEvents(self, logFilePath):
         # Open the text file for reading and CSV file for writing (create if not exists)
