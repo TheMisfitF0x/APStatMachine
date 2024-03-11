@@ -1,6 +1,6 @@
 import re
 import os.path
-import statMachComponents as appComps
+import statMachComponents as ac
 from enum import Enum
 
 #Nah, still doing Enumns cuz they look nice.
@@ -10,11 +10,6 @@ class EventType(Enum):
     Complete = 2
 
 class LogParser:
-    logFilePath = ""
-    sentEvents = []
-    hintEvents = []
-    completeEvents = []
-
     eventPatterns = {
         "sent": re.compile(
             r"\[root at (\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}),\d{3}\]: \(Team #\d\) (\w+) sent (.+?) to (\w+)"),
@@ -67,7 +62,7 @@ class LogParser:
                     sender = senderComp[:-2]
                     try:
                         # Get the game from the complete Sender
-                        senderGame = appComps.gameCodes[senderComp[-2:]]
+                        senderGame = ac.gameCodes[senderComp[-2:]]
                     except:
                         # If the game doesn't exist or isn't found, use the complete sender with the last two digits removed.
                         senderGame = senderComp[-2:]
@@ -78,7 +73,7 @@ class LogParser:
                     receiverComp = match.group(5)
                     receiver = receiverComp[:-2]
                     try:
-                        receiverGame = appComps.gameCodes[receiverComp[-2:]]
+                        receiverGame = ac.gameCodes[receiverComp[-2:]]
                     except:
                         receiverGame = receiverComp[-2:]
                     newRow.append(receiver)

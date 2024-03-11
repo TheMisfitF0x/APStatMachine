@@ -29,21 +29,43 @@ gameCodes = {
     "WG": "Wargroove"
 }
 
+# This is me trying to not cry as I deal with mucho event key... and also make things human readable.
+eventKeys = {
+    "FocusSelfSends": {
+        True: "-F EX TRUE-",
+        False: "-F EX FALSE"
+    },
+    "Generate":{
+        "Shotgun": "-GENERATE SHOTGUN GRAPHS-",
+        "Focus": "-GENERATE FOCUS GRAPHS-"
+    },
+    "Pop": {
+        "Shotgun": "-POP OUT SHOTGUN-",
+        "Focus": "-POP OUT FOCUS-"
+    },
+    "Update": {
+        "Spoiler": "-SPOILER PATH-",
+        "Log": "-LOG PATH-",
+        }
+}
+
 # Layouts (using notation from PySimpleGui)
 
 # Settings for the shotgun of four pie charts that show items sent/received by player or game.
 shotgun_graphs_settings = [
     [sg.Text("Items sent to self:"),
-     sg.Radio("Include", "SG-Exlusion-Options"), sg.Radio("Exclude", "SG-Exlusion-Options", True)],
-    [sg.Button("Generate", enable_events=True, key="-GENERATE SHOTGUN-"),
-     sg.Button("Push Out", enable_events=True, key="-POP OUT SHOTGUN-")]
+     sg.Radio("Include", "SG-Exlusion-Options", enable_events= True), sg.Radio("Exclude", "SG-Exlusion-Options", True, enable_events=True)],
+    [
+    #sg.Button("Generate", enable_events=True, key=eventKeys["Generate"]["Shotgun"]),
+     sg.Button("Push Out", enable_events=True, key=eventKeys["Pop"]["Shotgun"])]
 ]
 
 focus_graph_settings = [
     [sg.Text("Items sent to self:"),
-     sg.Radio("Include", "F-Exlusion-Options", key = "-F EX UPDATE-"), sg.Radio("Exclude", "F-Exlusion-Options", True, key = "-F EX UPDATE-")],
-    [sg.Button("Generate", enable_events=True, key="-GENERATE FOCUS-"),
-     sg.Button("Push Out", enable_events=True, key="-POP OUT FOCUS-")]
+     sg.Radio("Exclude", "F-Exlusion-Options", True, key = eventKeys["FocusSelfSends"][True], enable_events=True),
+     sg.Radio("Include", "F-Exlusion-Options", key = eventKeys["FocusSelfSends"][False], enable_events=True)],
+    [sg.Button("Generate", enable_events=True, key=eventKeys["Generate"]["Focus"]),
+     sg.Button("Push Out", enable_events=True, key=eventKeys["Pop"]["Focus"])]
 ]
 
 paths_and_settings_column = [
