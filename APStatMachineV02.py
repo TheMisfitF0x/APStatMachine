@@ -6,9 +6,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 import matplotlib.pyplot as mpl
 import matplotlib
-import statMachComponents as ac
+from statMachComponents import EventType, eventKeys
 from logparser import LogParser, EventType
-import datahandler as dh
+from datahandler import DataHandler
 from settings import FSettingName, FocusSettings
 
 # Set MatPlotLib to use the proper backend for PySimpleGUI
@@ -17,6 +17,8 @@ matplotlib.use("TkAgg")
 # Global vars, added here for clarity
 # Log Parser
 lp = None
+# Data Handler
+dh = DataHandler()
 # Focus Settings
 fs = FocusSettings()
 # Focus Figure and subplot
@@ -28,11 +30,15 @@ sgfAxesRaw = None
 sgfAxes = None
 
 # Methods
+
+
 def GenerateFocusGraph():
     global ffAx
-    value_counts = 
+    value_counts =
 
 # Initialization of a figure, don't use this repeatedly.
+
+
 def draw_figure(canvas, figure, loc=(0, 0)):
     figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
     figure_canvas_agg.draw()
@@ -54,7 +60,7 @@ ffAx = ff.add_subplot(111)
 ffAgg = FigureCanvasTkAgg(ff, window["-CANVAS-"].TKCanvas)
 
 # Shotgun graphs init
-sgf, sgfAxesRaw = mpl.subplots(2,2)
+sgf, sgfAxesRaw = mpl.subplots(2, 2)
 sgfAxes = sgfAxesRaw.flatten()
 
 fs = FocusSettings()
@@ -65,17 +71,16 @@ while True:
     if event == "Exit" or event == sg.WIN_CLOSED:
         break
 
-    if event == ac.eventKeys["Update"]["Log"]:
+    if event == eventKeys["Update"]["Log"]:
         lp = LogParser(window["-LOG PATH-"].get())
-        dh = DataHandler()
-        window[ac.eventKeys["Table"]].update(values=lp.GetEvents(EventType.Sent))
-    elif event == ac.eventKeys["Generate"]["Shotgun"]:
+        window["-TABLE PREVIEW-"].update(values=lp.GetEvents(EventType.Sent))
+    elif event == eventKeys["Generate"]["Shotgun"]:
         pass
-    elif event == ac.eventKeys["FocusSelfSends"][True]:
+    elif event == eventKeys["FocusSelfSends"][True]:
         print("Exclude Self Sends")
         fs.UpdateSettings(FSettingName.ExcludeSelfSends, True)
-    elif event == ac.eventKeys["FocusSelfSends"][False]:
+    elif event == eventKeys["FocusSelfSends"][False]:
         print("Do not exclude self sends")
         fs.UpdateSettings(FSettingName.ExcludeSelfSends, False)
-        
+
 window.close()

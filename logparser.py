@@ -1,13 +1,9 @@
 import re
 import os.path
 import statMachComponents as ac
+from statMachComponents import EventType
 from enum import Enum
 
-#Nah, still doing Enumns cuz they look nice.
-class EventType(Enum):
-    Sent = 0
-    Hint = 1
-    Complete = 2
 
 class LogParser:
     eventPatterns = {
@@ -31,7 +27,6 @@ class LogParser:
             return self.hintEvents
         elif eventType == EventType.Complete:
             return self.completeEvents
-        
 
     def ParseEvents(self, logFilePath):
         # Open the text file for reading and CSV file for writing (create if not exists)

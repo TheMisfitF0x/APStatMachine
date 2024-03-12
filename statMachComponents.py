@@ -1,4 +1,12 @@
 import PySimpleGUI as sg
+# Nah, still doing Enumns cuz they look nice.
+
+
+class EventType(Enum):
+    Sent = 0
+    Hint = 1
+    Complete = 2
+
 
 # Global Vars
 # Game Code Dictionary for LogParser (may also be used for lazy typing)
@@ -35,7 +43,7 @@ eventKeys = {
         True: "-F EX TRUE-",
         False: "-F EX FALSE"
     },
-    "Generate":{
+    "Generate": {
         "Shotgun": "-GENERATE SHOTGUN GRAPHS-",
         "Focus": "-GENERATE FOCUS GRAPHS-"
     },
@@ -46,7 +54,7 @@ eventKeys = {
     "Update": {
         "Spoiler": "-SPOILER PATH-",
         "Log": "-LOG PATH-",
-        }
+    }
 }
 
 # Layouts (using notation from PySimpleGui)
@@ -54,16 +62,17 @@ eventKeys = {
 # Settings for the shotgun of four pie charts that show items sent/received by player or game.
 shotgun_graphs_settings = [
     [sg.Text("Items sent to self:"),
-     sg.Radio("Include", "SG-Exlusion-Options", enable_events= True), sg.Radio("Exclude", "SG-Exlusion-Options", True, enable_events=True)],
+     sg.Radio("Include", "SG-Exlusion-Options", enable_events=True), sg.Radio("Exclude", "SG-Exlusion-Options", True, enable_events=True)],
     [
-    #sg.Button("Generate", enable_events=True, key=eventKeys["Generate"]["Shotgun"]),
-     sg.Button("Push Out", enable_events=True, key=eventKeys["Pop"]["Shotgun"])]
+        # sg.Button("Generate", enable_events=True, key=eventKeys["Generate"]["Shotgun"]),
+        sg.Button("Push Out", enable_events=True, key=eventKeys["Pop"]["Shotgun"])]
 ]
 
 focus_graph_settings = [
     [sg.Text("Items sent to self:"),
-     sg.Radio("Exclude", "F-Exlusion-Options", True, key = eventKeys["FocusSelfSends"][True], enable_events=True),
-     sg.Radio("Include", "F-Exlusion-Options", key = eventKeys["FocusSelfSends"][False], enable_events=True)],
+     sg.Radio("Exclude", "F-Exlusion-Options", True,
+              key=eventKeys["FocusSelfSends"][True], enable_events=True),
+     sg.Radio("Include", "F-Exlusion-Options", key=eventKeys["FocusSelfSends"][False], enable_events=True)],
     [sg.Button("Generate", enable_events=True, key=eventKeys["Generate"]["Focus"]),
      sg.Button("Push Out", enable_events=True, key=eventKeys["Pop"]["Focus"])]
 ]
