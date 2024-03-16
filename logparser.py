@@ -2,7 +2,6 @@ import re
 import os.path
 import statMachComponents as ac
 from statMachComponents import EventType
-from enum import Enum
 
 
 class LogParser:

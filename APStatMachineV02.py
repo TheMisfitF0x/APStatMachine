@@ -6,7 +6,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 import matplotlib.pyplot as mpl
 import matplotlib
-from statMachComponents import EventType, eventKeys
+from statMachComponents import EventType, eventKeys, layout
 from logparser import LogParser, EventType
 from datahandler import DataHandler
 from settings import FSettingName, FocusSettings
@@ -34,28 +34,30 @@ sgfAxes = None
 
 def GenerateFocusGraph():
     global ffAx
-    value_counts =
+    global ffAgg
+    value_counts = dh.ToDataframe(lp.GetEvents(EventType.Sent))[
+        fs.column].value_counts()
+    ffAx.cla()
+    ffAx.pie(value_counts, labels=value_counts.index,
+             autopct='%1.1f%%', startangle=140)
+    ffAx.axis('equal')
+    ffAx.set_title(f'Pie Chart of {fs.column}')
+    ffAgg.draw()
+    ffAgg.get_tk_widget().pack(side="top", fill="both", expand=1)
+
 
 # Initialization of a figure, don't use this repeatedly.
 
-
-def draw_figure(canvas, figure, loc=(0, 0)):
-    figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
-    figure_canvas_agg.draw()
-    figure_canvas_agg.get_tk_widget().pack(side='top', fill='both', expand=1)
-    return figure_canvas_agg
-
-
 # Init
 # Draw the Window
-window = sg.Window("AP Statistic Machine", ac.layout, finalize=True)
+window = sg.Window("AP Statistic Machine", layout, finalize=True)
 
 # Collect Canvas References
 canvas_elem = window['-CANVAS-']
 canvas = canvas_elem.TKCanvas
 
 # Focus graph init
-ff = mpl.Figure()
+ff = mpl.Figure(figsize=(10, 10))
 ffAx = ff.add_subplot(111)
 ffAgg = FigureCanvasTkAgg(ff, window["-CANVAS-"].TKCanvas)
 
@@ -76,6 +78,8 @@ while True:
         window["-TABLE PREVIEW-"].update(values=lp.GetEvents(EventType.Sent))
     elif event == eventKeys["Generate"]["Shotgun"]:
         pass
+    elif event == eventKeys["Generate"]["Focus"]:
+        GenerateFocusGraph()
     elif event == eventKeys["FocusSelfSends"][True]:
         print("Exclude Self Sends")
         fs.UpdateSettings(FSettingName.ExcludeSelfSends, True)

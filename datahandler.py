@@ -5,5 +5,6 @@ from statMachComponents import EventType
 
 
 class DataHandler:
-    def ToDataframe(eventList):
-        return pd.DataFrame(eventList)
+    def ToDataframe(self, eventList):
+        return pd.DataFrame(eventList, columns=[
+            "Date/Time (UTC)", "Sender", "Sender Game", "Receiver", "Receiver Game", "Item"])

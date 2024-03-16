@@ -1,4 +1,5 @@
 import PySimpleGUI as sg
+from enum import Enum
 # Nah, still doing Enumns cuz they look nice.
 
 
