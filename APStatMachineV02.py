@@ -1,7 +1,5 @@
 # Import Block
 import PySimpleGUI as sg
-import pandas as pd
-import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 import matplotlib.pyplot as mpl
