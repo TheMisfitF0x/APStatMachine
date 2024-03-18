@@ -104,7 +104,8 @@ paths_and_settings_column = [
 
 # For now will only show the name of the file that was chosen
 canvas_column = [
-    [sg.Canvas(key="-CANVAS-")]
+    [sg.Text(size=(40, 1), key="-TOUT-")],
+    [sg.Canvas(size=(640, 480), key="-CANVAS-")]
 ]
 
 # ----- Full layout -----
