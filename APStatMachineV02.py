@@ -54,8 +54,25 @@ def PopOutFocusGraph():
              autopct='%1.1f%%', startangle=140)
     ffAx.axis('equal')
     ffAx.set_title(f'Pie Chart of {fs.column}')
-    ff.show()
     ffAgg.get_tk_widget().pack(side="top", fill="both", expand=1)
+    ff.show()
+
+
+def PopOutShotgunGraph():
+    # Writing code is about 1000x harder when you're laughing your ass off.
+    # FUCK
+    columns = ["Sender", "Sender Game", "Receiver", "Receiver Game"]
+    colIndex = 0
+    for ax in sgfAxes:
+        value_counts = dh.ToDataframe(lp.GetEvents(
+            EventType.Sent)).value_counts(columns[colIndex])
+        ax.cla()
+        ax.pie(value_counts, labels=value_counts.index,
+               autopct='%1.1f%%', startangle=140)
+        ax.axis('equal')
+        ax.set_title(f'Pie Chart of {columns[colIndex]}')
+        colIndex += 1
+    sgf.show()
 
 
 # Init
@@ -72,7 +89,7 @@ ffAx = ff.add_subplot(111)
 ffAgg = FigureCanvasTkAgg(ff, window["-CANVAS-"].TKCanvas)
 
 # Shotgun graphs init
-sgf, sgfAxesRaw = mpl.subplots(2, 2)
+sgf, sgfAxesRaw = mpl.subplots(2, 2, figsize=(12, 8))
 sgfAxes = sgfAxesRaw.flatten()
 
 fs = FocusSettings()
@@ -86,8 +103,8 @@ while True:
     if event == eventKeys["Update"]["Log"]:
         lp = LogParser(window["-LOG PATH-"].get())
         window["-TABLE PREVIEW-"].update(values=lp.GetEvents(EventType.Sent))
-    elif event == eventKeys["Generate"]["Shotgun"]:
-        pass
+    elif event == eventKeys["Pop"]["Shotgun"]:
+        PopOutShotgunGraph()
     elif event == eventKeys["Generate"]["Focus"]:
         GenerateFocusGraph()
     elif event == eventKeys["Pop"]["Focus"]:
